@@ -18,16 +18,20 @@ public class Client {
              DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
              DataInputStream dis = new DataInputStream(socket.getInputStream());
              FileOutputStream fos = new FileOutputStream(outputFile)){
-            System.out.println("Echo client opened.");
+            System.out.println("Client connected to server. Starting copying of file " + args[0] + ".");
             if (args.length != 2) {
                 System.out.println("cpserver-DL <input> <output>");
                 System.exit(1);
             } else {
+                System.out.println("Sending query.");
                 dos.writeUTF(args[0]);
+                System.out.println("Receiving file.");
                 int fileSizeInBytes = Integer.parseInt(dis.readUTF());
                 byte[] buffer = new byte[fileSizeInBytes];
                 dis.read(buffer, 0, fileSizeInBytes);
+                System.out.println("Creating copy of a file in directory " + args[1] + ".");
                 fos.write(buffer, 0, fileSizeInBytes);
+                System.out.println("File copying procedure complete.");
             }
         }
     }

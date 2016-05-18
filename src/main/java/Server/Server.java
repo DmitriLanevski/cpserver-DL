@@ -28,6 +28,7 @@ public class Server implements Runnable{
              ByteArrayOutputStream bos = new ByteArrayOutputStream()){
             System.out.println(resName);
             if (!clientSocket.isClosed()){
+                System.out.println("Starting sending of a file " + resName + " to client.");
                 byte[] buffer = new byte[1024];
                 for(int readNumber; (readNumber = in.read(buffer)) != -1;){
                     bos.write(buffer, 0, readNumber);
@@ -35,7 +36,7 @@ public class Server implements Runnable{
                 byte[] bytes = bos.toByteArray();
                 dos.writeUTF(Integer.toString(bytes.length));
                 dos.write(bytes, 0, bytes.length);
-                System.out.println("Copy done");
+                System.out.println("Send done");
                 synchronized (sList){sList.remove(clientSocket);}
                 clientSocket.close();
                 System.out.println("Connection is closed.");
