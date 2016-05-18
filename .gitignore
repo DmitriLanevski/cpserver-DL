@@ -1,0 +1,5 @@
+.idea
+*.iml
+*.db
+target
+CrypterTest.java

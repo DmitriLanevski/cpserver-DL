@@ -1,0 +1,8 @@
+1. B, D, E, G
+2. A, C, (D) 
+3. (A), B, C, -D, E
+4. Kompileerub.
+5. Kompileerub.-
+6. Ei kompileeru.
+7. Kompileerub.
+8. Kompileerub.-
