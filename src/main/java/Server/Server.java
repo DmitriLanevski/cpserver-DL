@@ -24,25 +24,17 @@ public class Server implements Runnable{
         synchronized (sList){sList.add(clientSocket);}
         try (DataInputStream dis = new DataInputStream(clientSocket.getInputStream());
              InputStream in = this.getClass().getClassLoader().getResourceAsStream((resName = dis.readUTF()));
-             DataOutputStream dos = new DataOutputStream(clientSocket.getOutputStream())){
+             DataOutputStream dos = new DataOutputStream(clientSocket.getOutputStream());
+             ByteArrayOutputStream bos = new ByteArrayOutputStream()){
             System.out.println(resName);
             if (!clientSocket.isClosed()){
-                List<Byte> byteList = new ArrayList<>();
-                byte[] buffer = new byte[1];
-                int i = 0;
-                while((in.read(buffer, 0, 1)) != -1){
-                    System.out.println(i++);
-                    byteList.add(buffer[0]);
+                byte[] buffer = new byte[1024];
+                for(int readNumber; (readNumber = in.read(buffer)) != -1;){
+                    bos.write(buffer, 0, readNumber);
                 }
-                buffer = new byte[byteList.size()];
-                in.read(buffer, 0, buffer.length);
-                for (int k = 0; i < byteList.size(); i++){
-                    System.out.println(byteList.get(k).toString());
-                    buffer[k] = byteList.get(k);
-                }
-                System.out.println(Integer.toString(byteList.size()));
-                dos.writeUTF(Integer.toString(byteList.size()));
-                dos.write(buffer, 0, byteList.size());
+                byte[] bytes = bos.toByteArray();
+                dos.writeUTF(Integer.toString(bytes.length));
+                dos.write(bytes, 0, bytes.length);
                 System.out.println("Copy done");
                 synchronized (sList){sList.remove(clientSocket);}
                 clientSocket.close();
