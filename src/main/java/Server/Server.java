@@ -23,23 +23,36 @@ public class Server implements Runnable{
         String resName;
         synchronized (sList){sList.add(clientSocket);}
         try (DataInputStream dis = new DataInputStream(clientSocket.getInputStream());
-             InputStream in = this.getClass().getClassLoader().getResourceAsStream((resName = dis.readUTF()));
-             DataOutputStream dos = new DataOutputStream(clientSocket.getOutputStream());
-             ByteArrayOutputStream bos = new ByteArrayOutputStream()){
+             DataOutputStream dos = new DataOutputStream(clientSocket.getOutputStream())){
+
+            resName = dis.readUTF();
             System.out.println(resName);
+
             if (!clientSocket.isClosed()){
+
+                InputStream in = this.getClass().getClassLoader().getResourceAsStream(resName);
                 System.out.println("Starting sending of a file " + resName + " to client.");
-                byte[] buffer = new byte[1024];
-                for(int readNumber; (readNumber = in.read(buffer)) != -1;){
-                    bos.write(buffer, 0, readNumber);
+
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+                int readedBytes;
+                while ((readedBytes = in.read()) != -1) {
+                    baos.write(readedBytes);
                 }
-                byte[] bytes = bos.toByteArray();
-                dos.writeUTF(Integer.toString(bytes.length));
-                dos.write(bytes, 0, bytes.length);
+
+                dos.writeInt(baos.size());
+                System.out.println(baos.size());
+                dos.write(baos.toByteArray());
+
                 System.out.println("Send done");
+
                 synchronized (sList){sList.remove(clientSocket);}
                 clientSocket.close();
                 System.out.println("Connection is closed.");
+
+                in.close();
+                baos.flush();
+                baos.close();
             }
         } catch (IOException IOe){
             throw new RuntimeException(IOe);
